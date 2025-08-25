@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Популярные цитаты{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="quote-card">
+        <h1 class="text-center mb-4"><i class="fas fa-fire"></i> Топ-10 популярных цитат</h1>
+        
+        <!-- Фильтры -->
+        <div class="card mb-4">
+            <div class="card-header" style="background-color: var(--primary-color); color: white;">
+                <i class="fas fa-sliders-h"></i> Настройки
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="source" class="form-label"><i class="fas fa-hashtag"></i> Источник:</label>
+                        <select name="source" id="source" class="form-select">
+                            <option value="">Все источники</option>
+                            {% for source in all_sources %}
+                                <option value="{{ source.name }}" {% if current_source == source.name %}selected{% endif %}>
+                                    {{ source.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="sort_by" class="form-label"><i class="fas fa-sort-amount-down"></i> Сортировка:</label>
+                        <select name="sort_by" id="sort_by" class="form-select">
+                            <option value="likes" {% if current_sort == 'likes' %}selected{% endif %}>По лайкам</option>
+                            <option value="views" {% if current_sort == 'views' %}selected{% endif %}>По просмотрам</option>
+                            <option value="weight" {% if current_sort == 'weight' %}selected{% endif %}>По весу</option>
+                            <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>По новизне</option>
+                        </select>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-bolt"></i> Применить
+                        </button>
+                        <a href="{% url 'popular_quotes' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-undo"></i> Сбросить
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        {% if popular_quotes %}
+            <div class="top-quotes-list">
+                {% for quote in popular_quotes %}
+                <div class="quote-item mb-4 bounce-element">
+                    <div class="quote-rank">{{ forloop.counter }}</div>
+                    <div class="quote-content">
+                        <div class="quote-bubble">
+                            <p class="quote-text">{{ quote.text }}</p>
+                            <div class="quote-source-container">
+                                <span class="quote-source-label">Источник:</span>
+                                <span class="quote-source">{{ quote.source.name }}</span>
+                            </div>
+                        </div>
+                        <div class="stats-container mt-3">
+                            <div class="stat-badge">
+                                <i class="fas fa-eye"></i> Просмотры: <span>{{ quote.views }}</span>
+                            </div>
+                            <div class="stat-badge">
+                                <i class="fas fa-thumbs-up"></i> Лайки: <span>{{ quote.likes }}</span>
+                            </div>
+                            <div class="stat-badge">
+                                <i class="fas fa-thumbs-down"></i> Дизлайки: <span>{{ quote.dislikes }}</span>
+                            </div>
+                            <div class="stat-badge">
+                                <i class="fas fa-balance-scale"></i> Вес: <span>{{ quote.weight }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center bounce-element">
+                <i class="fas fa-ghost fa-2x mb-2"></i>
+                <p>Здесь пока пусто! Будь первым, кто добавит крутую цитату.</p>
+                <a href="{% url 'add_quote' %}" class="btn btn-primary mt-2">
+                    <i class="fas fa-plus-circle"></i> Добавить цитату
+                </a>
+            </div>
+        {% endif %}
+        
+        <div class="mt-5 text-center action-buttons">
+            <a href="{% url 'random_quote' %}" class="btn btn-primary me-2 bounce-element">
+                <i class="fas fa-random"></i> Случайная цитата
+            </a>
+            <a href="{% url 'add_quote' %}" class="btn btn-outline-primary bounce-element">
+                <i class="fas fa-plus-circle"></i> Добавить цитату
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .top-quotes-list {
+        counter-reset: quote-counter;
+    }
+    
+    .quote-item {
+        display: flex;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border-left: 5px solid var(--primary-color);
+        margin-bottom: 15px;
+    }
+    
+    .quote-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(52, 152, 219, 0.15);
+    }
+    
+    .quote-rank {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: bold;
+        font-size: 1.8rem;
+    }
+    
+    .quote-content {
+        flex: 1;
+        padding: 20px;
+    }
+    
+    .quote-text {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: var(--dark-text);
+        font-style: italic;
+    }
+    
+    .quote-source {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-top: 5px;
+    }
+    
+    .stats-container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+        justify-content: flex-start;
+    }
+    
+    .stat-badge {
+        background-color: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        margin-right: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .stat-badge i {
+        color: var(--primary-color);
+        margin-right: 5px;
+    }
+    
+    .action-buttons .btn {
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}

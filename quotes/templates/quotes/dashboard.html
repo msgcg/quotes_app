@@ -1,0 +1,157 @@
+{% extends "quotes/base.html" %}
+
+{% block title %}Quotes Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Dashboard</h1>
+            <p class="text-muted">Statistics and insights about your quote collection</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Quotes</h5>
+                    <h3 class="card-text">{{ total_quotes }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Total Sources</h5>
+                    <h3 class="card-text">{{ total_sources }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Average Views</h5>
+                    <h3 class="card-text">{{ total_views|floatformat:1 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Average Likes</h5>
+                    <h3 class="card-text">{{ total_likes|floatformat:1 }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Top Quotes by Likes -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Top Quotes by Likes</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_quotes %}
+                        <ol class="list-group list-group-numbered">
+                            {% for quote in top_quotes %}
+                            <li class="list-group-item">
+                                <strong>"{{ quote.text|truncatewords:10 }}"</strong><br>
+                                <small class="text-muted">{{ quote.source.name }} | 
+                                👍 {{ quote.likes }} | 👎 {{ quote.dislikes }} | 👁 {{ quote.views }}</small>
+                            </li>
+                            {% endfor %}
+                        </ol>
+                    {% else %}
+                        <p class="text-muted">No quotes found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Most Active Sources -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Most Active Sources</h5>
+                </div>
+                <div class="card-body">
+                    {% if sources_with_most_quotes %}
+                        <ol class="list-group list-group-numbered">
+                            {% for source in sources_with_most_quotes %}
+                            <li class="list-group-item">
+                                <strong>{{ source.name }}</strong> - 
+                                {{ source.quote_count }} quote{{ source.quote_count|pluralize }}
+                            </li>
+                            {% endfor %}
+                        </ol>
+                    {% else %}
+                        <p class="text-muted">No sources found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Most Viewed Quotes -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Most Viewed Quotes</h5>
+                </div>
+                <div class="card-body">
+                    {% if most_viewed %}
+                        <ol class="list-group list-group-numbered">
+                            {% for quote in most_viewed %}
+                            <li class="list-group-item">
+                                <strong>"{{ quote.text|truncatewords:10 }}"</strong><br>
+                                <small class="text-muted">{{ quote.source.name }} | 
+                                Views: {{ quote.views }} | 👍 {{ quote.likes }} | 👎 {{ quote.dislikes }}</small>
+                            </li>
+                            {% endfor %}
+                        </ol>
+                    {% else %}
+                        <p class="text-muted">No quotes found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Quotes -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Recent Quotes</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_quotes %}
+                        <ul class="list-group">
+                            {% for quote in recent_quotes %}
+                            <li class="list-group-item">
+                                <strong>"{{ quote.text|truncatewords:10 }}"</strong><br>
+                                <small class="text-muted">{{ quote.source.name }} | 
+                                Weight: {{ quote.weight }} | 👍 {{ quote.likes }} | 👎 {{ quote.dislikes }}</small>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">No quotes found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <a href="{% url 'random_quote' %}" class="btn btn-primary mr-2">Get Random Quote</a>
+            <a href="{% url 'popular_quotes' %}" class="btn btn-success mr-2">Popular Quotes</a>
+            <a href="{% url 'add_quote' %}" class="btn btn-info">Add New Quote</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

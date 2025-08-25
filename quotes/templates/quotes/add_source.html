@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Добавить новый источник{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="quote-card">
+      <h1 class="text-center mb-4"><i class="fas fa-book"></i> Добавить новый источник</h1>
+      
+      {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+      <form method="post" action="{% url 'add_source' %}" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <div class="mb-3">
+          <label for="id_name" class="form-label">Название источника:</label>
+          {{ form.name }}
+          <div class="form-text">Введите название книги, фильма или другого источника цитат.</div>
+        </div>
+        
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <a href="{% url 'add_quote' %}" class="btn btn-outline-secondary me-md-2">
+            <i class="fas fa-arrow-left"></i> Назад к добавлению цитаты
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Сохранить источник
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Случайная цитата{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="quote-card">
+      <h1 class="text-center mb-4"><i class="fas fa-quote-right"></i> Случайная цитата</h1>
+      
+      <div class="quote-container">
+        <div class="quote-bubble bounce-element">
+          <p class="quote-text">{{ quote.text }}</p>
+          <div class="quote-source-container">
+            <span class="quote-source-label">Источник:</span>
+            <span class="quote-source">{{ quote.source.name }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stats-container mt-4">
+        <div class="stat-badge bounce-element">
+          <i class="fas fa-eye"></i><span id="view-count">{{ quote.views }}</span>
+        </div>
+        
+        <div class="stat-badge bounce-element" id="like-button" onclick="likeQuote({{ quote.id }})">
+          <i class="fas fa-thumbs-up"></i><span id="like-count">{{ quote.likes }}</span>
+        </div>
+        
+        <div class="stat-badge bounce-element" id="dislike-button" onclick="dislikeQuote({{ quote.id }})">
+          <i class="fas fa-thumbs-down"></i><span id="dislike-count">{{ quote.dislikes }}</span>
+        </div>
+        
+        <div class="stat-badge bounce-element">
+          <i class="fas fa-balance-scale"></i><span>{{ quote.weight }}</span>
+        </div>
+      </div>
+      
+      <div class="mt-5 text-center action-buttons">
+        <a href="{% url 'random_quote' %}" class="btn btn-primary me-2 bounce-element">
+          <i class="fas fa-random"></i> Новая цитата
+        </a>
+        <a href="{% url 'popular_quotes' %}" class="btn btn-outline-primary bounce-element">
+          <i class="fas fa-star"></i> Топ цитат
+        </a>
+        <a href="{% url 'add_quote' %}" class="btn btn-outline-primary ms-2 bounce-element">
+          <i class="fas fa-plus"></i> Добавить
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <style>
+    /* Стиль для прыгающих элементов перенесен в base.html */
+  </style>
+
+  <style>
+    .quote-container {
+      margin: 30px 0;
+    }
+    
+    .quote-bubble {
+      background-color: #f8f9fa;
+      border-left: 4px solid var(--primary-color);
+      color: var(--dark-text);
+      padding: 25px;
+      border-radius: 8px;
+      position: relative;
+    }
+    
+    .quote-bubble:after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50px;
+      border-width: 15px 15px 0;
+      border-style: solid;
+      border-color: #12c2e9 transparent;
+    }
+    
+    .quote-text {
+      font-size: 1.3rem;
+      line-height: 1.6;
+      font-style: italic;
+      margin-bottom: 15px;
+    }
+    
+    .quote-source-container {
+      display: inline-block;
+      background-color: rgba(255,255,255,0.2);
+      padding: 5px 15px;
+      border-radius: 30px;
+    }
+    
+    .quote-source-label {
+      font-weight: 300;
+      margin-right: 5px;
+      font-size: 0.9rem;
+    }
+    
+    .quote-source {
+      font-weight: 600;
+    }
+    
+    .stats-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
+    
+    .stat-card {
+      display: flex;
+      align-items: center;
+      background-color: white;
+      padding: 15px;
+      border-radius: 15px;
+      min-width: 140px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .views-card {
+      border-left: 4px solid #3498db;
+    }
+    
+    .likes-card {
+      border-left: 4px solid #2ecc71;
+    }
+    
+    .dislikes-card {
+      border-left: 4px solid #e74c3c;
+    }
+    
+    .weight-card {
+      border-left: 4px solid #f39c12;
+      cursor: default;
+    }
+    
+    .stat-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      margin-right: 15px;
+      font-size: 1.2rem;
+    }
+    
+    .views-card .stat-icon {
+      background-color: rgba(52, 152, 219, 0.1);
+      color: #3498db;
+    }
+    
+    .likes-card .stat-icon {
+      background-color: rgba(46, 204, 113, 0.1);
+      color: #2ecc71;
+    }
+    
+    .dislikes-card .stat-icon {
+      background-color: rgba(231, 76, 60, 0.1);
+      color: #e74c3c;
+    }
+    
+    .weight-card .stat-icon {
+      background-color: rgba(243, 156, 18, 0.1);
+      color: #f39c12;
+    }
+    
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .stat-label {
+      font-size: 0.8rem;
+      color: #7f8c8d;
+      margin-bottom: 2px;
+    }
+    
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    
+    .btn-gradient {
+      background: linear-gradient(45deg, #ff2d95, #4355db);
+      border: none;
+      color: white;
+      transition: all 0.3s;
+      padding: 10px 25px;
+      border-radius: 30px;
+      font-weight: 600;
+    }
+    
+    .btn-gradient:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(255, 45, 149, 0.4);
+      color: white;
+    }
+    
+    .btn-gradient-blue {
+      background: linear-gradient(45deg, #12c2e9, #4355db);
+      border: none;
+      color: white;
+      transition: all 0.3s;
+      padding: 10px 25px;
+      border-radius: 30px;
+      font-weight: 600;
+    }
+    
+    .btn-gradient-blue:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(18, 194, 233, 0.4);
+      color: white;
+    }
+    
+    .btn-gradient-green {
+      background: linear-gradient(45deg, #00b09b, #96c93d);
+      border: none;
+      color: white;
+      transition: all 0.3s;
+      padding: 10px 25px;
+      border-radius: 30px;
+      font-weight: 600;
+    }
+    
+    .btn-gradient-green:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 176, 155, 0.4);
+      color: white;
+    }
+    
+    .action-buttons .btn {
+      margin: 0 5px;
+    }
+  </style>
+
+  <script>
+    // Получаем CSRF-токен из cookie
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    function likeQuote(quoteId) {
+      fetch(`/quotes/like/${quoteId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Ошибка сети. Пожалуйста, попробуйте еще раз.');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.likes) {
+          document.getElementById('like-count').textContent = data.likes;
+          
+          // Анимация кнопки
+          const likeBtn = document.getElementById('like-button');
+          likeBtn.classList.add('btn-success');
+          likeBtn.classList.remove('btn-outline-success');
+          
+          setTimeout(() => {
+            likeBtn.classList.remove('btn-success');
+            likeBtn.classList.add('btn-outline-success');
+          }, 500);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Не удалось поставить лайк. Пожалуйста, попробуйте еще раз.');
+      });
+    }
+
+    function dislikeQuote(quoteId) {
+      fetch(`/quotes/dislike/${quoteId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.dislikes) {
+          document.getElementById('dislike-count').textContent = data.dislikes;
+          
+          // Анимация кнопки
+          const dislikeBtn = document.getElementById('dislike-button');
+          dislikeBtn.classList.add('btn-danger');
+          dislikeBtn.classList.remove('btn-outline-danger');
+          
+          setTimeout(() => {
+            dislikeBtn.classList.remove('btn-danger');
+            dislikeBtn.classList.add('btn-outline-danger');
+          }, 500);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Не удалось поставить дизлайк. Пожалуйста, попробуйте еще раз.');
+      });
+    }
+  </script>
+{% endblock %}
