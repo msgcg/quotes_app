@@ -50,6 +50,16 @@
    ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
    ```
    Замените `yourdomain.com` на ваш домен.
+
+   Так же для работы с CSRF токеном необходимо добавить домен в список доверенных источников:
+   ```python
+   CSRF_TRUSTED_ORIGINS = [
+    "https://yourdomain.com",
+    "https://www.yourdomain.com",
+   ]
+   ```
+   Замените `yourdomain.com` на ваш домен.
+
 6. Секретный ключ:
    Для обеспечения безопасности, `SECRET_KEY` Django должен храниться в переменных окружения, а не непосредственно в коде. Создайте файл `.env` в корневой директории проекта (`quotes_project/`) и добавьте в него следующую строку:
 
